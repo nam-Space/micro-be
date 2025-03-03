@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+env/
+venv/
+*.egg-info/
+
+# Django-specific files
+db.sqlite3
+instance/
+media/
+staticfiles/
+
+# Logs and debug files
+*.log
+*.pot
+*.pyc
+*.pyo
+*.swp
+*.swo
+*.DS_Store
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Secrets and config files
+.env
+*.pem
+
+# Migrations (optional, if you want to keep them untracked)
+**/migrations/*.py
+!**/migrations/__init__.py
+
+# Docker and deployment
+docker-compose.override.yml
+.dockerignore
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
