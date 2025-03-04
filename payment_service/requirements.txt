@@ -1,0 +1,8 @@
+Django>=5.1,<6.0
+djangorestframework
+drf-yasg
+paypalrestsdk
+rest_framework_simplejwt  # If you're using JWT authentication
+mysqlclient  # Only if using MySQL
+httpx  # If API Gateway uses it for request forwarding
+gunicorn  # For production deployment

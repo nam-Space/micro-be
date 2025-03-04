@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  api_gateway:
+    build: ./api_gateway
+    container_name: api_gateway
+    ports:
+      - "8000:8000" # Make sure nothing else is using this port
+    depends_on:
+      - customer_service
+      - order_service
+      - product_service
+      - cart_service
+      - payment_service
+    environment:
+      - CUSTOMER_SERVICE_URL=http://customer_service:6789
+      - ORDER_SERVICE_URL=http://order_service:8765
+      - PRODUCT_SERVICE_URL=http://product_service:9876
+      - CART_SERVICE_URL=http://cart_service:8080
+      - PAYMENT_SERVICE_URL=http://payment_service:8888
+
+  customer_service:
+    build: ./customer
+    container_name: customer_service
+    ports:
+      - "6789:8000" # Avoid conflicts
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=mysql://root:newpassword@db:3306/customer_be
+
+  order_service:
+    build: ./order_service
+    container_name: order_service
+    ports:
+      - "8765:8000"
+
+  product_service:
+    build: ./product_service
+    container_name: product_service
+    ports:
+      - "9876:8000"
+
+  cart_service:
+    build: ./cart_service
+    container_name: cart_service
+    ports:
+      - "8080:8000"
+
+  payment_service:
+    build: ./payment_service
+    container_name: payment_service
+    ports:
+      - "8888:8000"
+
+  db:
+    image: mysql:8.0
+    container_name: ecommerce_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: newpassword
+      MYSQL_DATABASE: customer_be
+    ports:
+      - "3306:3306"

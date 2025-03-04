@@ -1,0 +1,6 @@
+Django>=5.1,<6.0
+djangorestframework
+rest_framework_simplejwt
+drf-yasg
+mysqlclient  # Needed because customer_service uses MySQL
+gunicorn  # Recommended for production

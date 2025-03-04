@@ -1,0 +1,5 @@
+Django>=5.1,<6.0
+djangorestframework
+rest_framework_simplejwt
+drf-yasg
+gunicorn  # Recommended for production

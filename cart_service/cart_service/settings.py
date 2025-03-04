@@ -126,9 +126,14 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 PRODUCT_SERVICE_URLS = {
-    "books": "http://127.0.0.1:9876/api/books/",
-    "phones": "http://127.0.0.1:9876/api/phones/",
-    "clothes": "http://127.0.0.1:9876/api/clothes/",
+    "books": "http://127.0.0.1:8006/api/books/",
+    "phones": "http://127.0.0.1:8006/api/phones/",
+    "clothes": "http://127.0.0.1:8006/api/clothes/",
 }
 
-CUSTOMER_SERVICE_URL = "http://localhost:9876/api/customers/"
+CUSTOMER_SERVICE_URL = "http://localhost:8003/api/customers/"
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}

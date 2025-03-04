@@ -1,0 +1,7 @@
+Django>=5.1,<6.0
+djangorestframework
+rest_framework_simplejwt
+drf-yasg
+mysqlclient  # Only if using MySQL
+httpx  # If you're using an API Gateway
+gunicorn  # For production deployment

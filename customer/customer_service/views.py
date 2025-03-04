@@ -29,9 +29,16 @@ class LoginView(generics.CreateAPIView):
         user = authenticate(username=username, password=password)
         if user is not None:
             refresh = RefreshToken.for_user(user)
+            user_data = {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            # Add other user fields if needed
+            }
             return Response({
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
+                "user": str(user_data)
             })
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
