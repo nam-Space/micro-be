@@ -19,9 +19,9 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('<int:customer_id>/', get_cart, name="get_cart"),
-    path('<int:customer_id>/add/<str:product_type>/<int:product_id>', add_to_cart, name="add_to_cart"),
+    path('cart/', add_to_cart, name="add_to_cart"),
     path('<int:customer_id>/remove/<str:product_type>/<int:product_id>/', remove_from_cart, name="remove_from_cart"),
-    path('<int:customer_id>/update/<str:product_type>/<int:product_id>/', update_cart_item, name="update_cart_item"),
+    path('cart-update/', update_cart_item, name="update_cart_item"),
     
     # Swagger UI
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-ui'),

@@ -9,8 +9,8 @@ class Customer(AbstractUser):
         ('premium', 'Premium Customer'),
     ]
     customer_type = models.CharField(max_length=20, choices=CUSTOMER_TYPES)
-    phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
-
+    phone_number = models.CharField(max_length=15, unique=False, null=True, blank=True)
+    email = models.EmailField(unique=True, max_length=1255)
     # ✅ Fix conflicts by setting related_name for groups & permissions
     groups = models.ManyToManyField(
         "auth.Group",

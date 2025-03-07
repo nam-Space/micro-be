@@ -19,6 +19,8 @@ def check_product_stock(product_type, product_id, quantity):
     response = requests.get(url)
     if response.status_code == 200:
         product = response.json()
+        print(product)
+        print(quantity)
         return product["stock"] >= quantity
     return False
 
@@ -47,3 +49,16 @@ def update_product_stock(product_type, product_id, quantity):
     
     return response.status_code == 200
 
+def get_product_by_url(product_type, product_id):
+    url = get_product_url(product_type, product_id)
+    if not url:
+        return False
+    response = requests.get(url)
+    if response.status_code != 200:
+        return False
+    product = response.json()
+    return {
+        "id":product.get("id"),
+        "name": product.get("name"),
+        "url":product.get("url")
+    }

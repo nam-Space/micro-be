@@ -16,6 +16,37 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
     serializer_class = RegisterSerializer
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+
+            return Response({
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email
+                },
+                "tokens": {
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh)
+                }
+            }, status=status.HTTP_201_CREATED)
+
+        # Extracting error messages
+        error_messages = []
+        for field, errors in serializer.errors.items():
+            for error in errors:
+                error_messages.append(f"{field}: {error}")
+
+        return Response({
+            "message": "Registration failed",
+            "errors": serializer.errors,  # Detailed field-wise errors
+            "error_messages": error_messages  # Human-readable error list
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 # Login API
 class LoginView(generics.CreateAPIView):
@@ -42,6 +73,7 @@ class LoginView(generics.CreateAPIView):
             })
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
+     
 
 # ViewSets define the CRUD API behavior.
 class CustomerViewSet(viewsets.ModelViewSet):

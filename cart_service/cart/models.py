@@ -9,3 +9,5 @@ class CartItem(models.Model):
     product_id = models.IntegerField()
     product_type = models.CharField(max_length=20)  # "books", "phones", "clothes"
     quantity = models.PositiveIntegerField(default=1)
+    product_name = models.CharField( max_length=50, default="")
+    image_urls = models.CharField( max_length=200, default="")
