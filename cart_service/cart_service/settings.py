@@ -133,7 +133,8 @@ PRODUCT_SERVICE_URLS = {
 
 CUSTOMER_SERVICE_URL = "http://localhost:8003/api/customers/"
 REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    )
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',  # Ensures JSON responses
+    ],
 }
+

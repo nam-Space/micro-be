@@ -11,3 +11,4 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     product_name = models.CharField( max_length=50, default="")
     image_urls = models.CharField( max_length=200, default="")
+    price = models.PositiveIntegerField(default=0)

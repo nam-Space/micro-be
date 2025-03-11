@@ -60,5 +60,6 @@ def get_product_by_url(product_type, product_id):
     return {
         "id":product.get("id"),
         "name": product.get("name"),
-        "url":product.get("url")
+        "url":product.get("url"),
+        "price": product.get("price")
     }
