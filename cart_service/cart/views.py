@@ -6,12 +6,15 @@ from .utils import check_product_stock, update_product_stock, get_product_by_url
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 import json
+
+
 @api_view(["GET"])
 def get_cart(request, customer_id):
     """Retrieve cart details for a customer"""
     cart, created = Cart.objects.get_or_create(customer_id=customer_id)
     serializer = CartSerializer(cart)
     return Response(serializer.data)
+
 
 # @api_view(["POST"])
 # def add_to_cart(request, customer_id, product_id, product_type):
@@ -35,32 +38,43 @@ def get_cart(request, customer_id):
 
 #     return Response({"message": "Item added to cart"})
 
+
 @api_view(["DELETE"])
 def remove_from_cart(request, customer_id, product_id, product_type):
     """Remove an item from the cart"""
     try:
         cart = Cart.objects.get(customer_id=customer_id)
-        cart_item = CartItem.objects.get(cart=cart, product_id=product_id, product_type=product_type)
+        cart_item = CartItem.objects.get(
+            cart=cart, product_id=product_id, product_type=product_type
+        )
         cart_item.delete()
         return Response({"message": "Item removed from cart"})
     except CartItem.DoesNotExist:
         return Response({"error": "Item not found"}, status=404)
 
+
 @swagger_auto_schema(
     method="patch",
     request_body=openapi.Schema(
-       type=openapi.TYPE_OBJECT,
+        type=openapi.TYPE_OBJECT,
         required=["quantity", "productId", "customerId", "category"],  # Required fields
         properties={
-            "quantity": openapi.Schema(type=openapi.TYPE_INTEGER, description="Quantity of the product"),
-            "productId": openapi.Schema(type=openapi.TYPE_INTEGER, description="ID of the product"),
-            "customerId": openapi.Schema(type=openapi.TYPE_INTEGER, description="ID of the customer"),
-            "category": openapi.Schema(type=openapi.TYPE_STRING, description="category of product"),
+            "quantity": openapi.Schema(
+                type=openapi.TYPE_INTEGER, description="Quantity of the product"
+            ),
+            "productId": openapi.Schema(
+                type=openapi.TYPE_INTEGER, description="ID of the product"
+            ),
+            "customerId": openapi.Schema(
+                type=openapi.TYPE_INTEGER, description="ID of the customer"
+            ),
+            "category": openapi.Schema(
+                type=openapi.TYPE_STRING, description="category of product"
+            ),
         },
     ),
     responses={200: openapi.Response("Item added to cart"), 400: "Invalid request"},
 )
-
 @api_view(["PATCH"])
 def update_cart_item(request):
     """Update quantity of an item in the cart"""
@@ -70,7 +84,9 @@ def update_cart_item(request):
     category = request.data.get("category")
     try:
         cart = Cart.objects.get(customer_id=customer_id)
-        cart_item = CartItem.objects.get(cart=cart, product_id=product_id, product_type=category)
+        cart_item = CartItem.objects.get(
+            cart=cart, product_id=product_id, product_type=category
+        )
         product = get_product_by_url(category, product_id)
         # print(product)
         if check_product_stock(category, product_id, quantity):
@@ -84,22 +100,32 @@ def update_cart_item(request):
     except CartItem.DoesNotExist:
         return Response({"error": "Item not found"}, status=404)
 
+
 @swagger_auto_schema(
     method="post",
     request_body=openapi.Schema(
-       type=openapi.TYPE_OBJECT,
+        type=openapi.TYPE_OBJECT,
         required=["quantity", "productId", "customerId", "category"],  # Required fields
         properties={
-            "quantity": openapi.Schema(type=openapi.TYPE_INTEGER, description="Quantity of the product"),
-            "productId": openapi.Schema(type=openapi.TYPE_INTEGER, description="ID of the product"),
-            "customerId": openapi.Schema(type=openapi.TYPE_INTEGER, description="ID of the customer"),
-            "category": openapi.Schema(type=openapi.TYPE_STRING, description="category of product"),
+            "quantity": openapi.Schema(
+                type=openapi.TYPE_INTEGER, description="Quantity of the product"
+            ),
+            "productId": openapi.Schema(
+                type=openapi.TYPE_INTEGER, description="ID of the product"
+            ),
+            "customerId": openapi.Schema(
+                type=openapi.TYPE_INTEGER, description="ID of the customer"
+            ),
+            "category": openapi.Schema(
+                type=openapi.TYPE_STRING, description="category of product"
+            ),
         },
     ),
     responses={200: openapi.Response("Item added to cart"), 400: "Invalid request"},
 )
 @api_view(["POST"])
 def add_to_cart(request):
+
     quantity = request.data.get("quantity", 1)
     customerId = request.data.get("customerId")
     productId = request.data.get("productId")
@@ -118,10 +144,10 @@ def add_to_cart(request):
         return Response({"error": "Product not found"}, status=404)
     print(product)
     cartItem, created = CartItem.objects.get_or_create(
-    cart=cart,
-    product_id=productId,
-    product_type=category,  # ✅ Ensure product uniqueness
-    defaults={"quantity": quantity}
+        cart=cart,
+        product_id=productId,
+        product_type=category,  # ✅ Ensure product uniqueness
+        defaults={"quantity": quantity},
     )
 
     # Set additional fields
@@ -144,7 +170,9 @@ def add_to_cart(request):
         "items": [
             {"product_id": item.product_id, "quantity": item.quantity}
             for item in cart.items.all()
-        ]
+        ],
     }
 
-    return Response({"message": "Item successfully added to cart", "cart": cart_data}, status=200)  # Corrected status
+    return Response(
+        {"message": "Item successfully added to cart", "cart": cart_data}, status=200
+    )  # Corrected status

@@ -1,0 +1,7 @@
+Django>=5.1,<6.0
+djangorestframework
+djangorestframework-simplejwt
+drf-yasg
+mysqlclient  # Required for MySQL database connections
+httpx  # Used in API Gateway for request forwarding
+gunicorn  # For production server
