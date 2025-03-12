@@ -79,12 +79,12 @@ WSGI_APPLICATION = "clothes_service.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "clothes_be",
-        "USER": "root",
-        "PASSWORD": "",
-        "HOST": "127.0.0.1",  # ✅ Use local MySQL instead of Docker
-        "PORT": "3306",
+        "ENGINE": "djongo",  # Sử dụng djongo để kết nối MongoDB
+        "NAME": "ecommerce_clothes",
+        "CLIENT": {
+            "host": "mongodb+srv://FirstDemo:gRiFtXz20PlbtrwK@cluster0.nnzr3gd.mongodb.net/ecommerce_clothes",
+            "authSource": "admin",  # Database để xác thực
+        },
     }
 }
 
