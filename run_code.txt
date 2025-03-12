@@ -1,0 +1,25 @@
+npm run dev
+
+cd api_gateway
+python manage.py runserver 8001
+
+cd book_service
+python manage.py runserver 8002
+
+cd cart_service
+python manage.py runserver 8003
+
+cd clothes_service
+python manage.py runserver 8004
+
+cd customer
+python manage.py runserver 8005
+
+cd order_service
+python manage.py runserver 8006
+
+cd payment_service
+python manage.py runserver 8007
+
+cd phone_service
+python manage.py runserver 8008

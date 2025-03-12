@@ -1,7 +1,9 @@
 import requests
 from django.conf import settings
 import requests
+
 PRODUCT_SERVICE_URLS = settings.PRODUCT_SERVICE_URLS
+
 
 def get_product_url(product_type, product_id):
     """Get correct product API URL based on product type"""
@@ -10,20 +12,23 @@ def get_product_url(product_type, product_id):
         return f"{base_url}{product_id}/"
     return None
 
+
 def check_product_stock(product_type, product_id, quantity):
     """Check if product stock is available"""
     url = get_product_url(product_type, product_id)
+    print(f"product_id={product_id}, product_type={product_type}, url={url}")
     if not url:
         return False
-    
+
     response = requests.get(url)
+    print(f"response={response}")
     if response.status_code == 200:
         product = response.json()
+        print(f"product: {product}")
         print(product)
         print(quantity)
         return product["stock"] >= quantity
     return False
-
 
 
 def update_product_stock(product_type, product_id, quantity):
@@ -42,12 +47,13 @@ def update_product_stock(product_type, product_id, quantity):
         return False
     print(quantity)
     soluong = int(product["stock"]) - int(quantity)
-    
+
     # Update stock with PATCH request
     response = requests.patch(url, json={"stock": soluong})
     print(response.json())
-    
+
     return response.status_code == 200
+
 
 def get_product_by_url(product_type, product_id):
     url = get_product_url(product_type, product_id)
@@ -58,8 +64,8 @@ def get_product_by_url(product_type, product_id):
         return False
     product = response.json()
     return {
-        "id":product.get("id"),
+        "id": product.get("id"),
         "name": product.get("name"),
-        "url":product.get("url"),
-        "price": product.get("price")
+        "url": product.get("url"),
+        "price": product.get("price"),
     }
