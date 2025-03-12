@@ -93,7 +93,7 @@ def update_cart_item(request):
             cart_item.quantity = quantity
             cart_item.price = product["price"]
             cart_item.save()
-            update_product_stock(category, product_id, quantity)
+            # update_product_stock(category, product_id, quantity)
             return Response({"message": "Cart item updated"})
         else:
             return Response({"error": "Insufficient stock"}, status=400)
