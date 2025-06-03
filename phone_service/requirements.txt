@@ -1,7 +1,36 @@
-Django>=5.1,<6.0
+Django
 djangorestframework
 djangorestframework-simplejwt
 drf-yasg
 mysqlclient  # Required for MySQL database connections
 httpx  # Used in API Gateway for request forwarding
 gunicorn  # For production server
+
+django-cors-headers
+django-allauth
+django-crispy-forms
+django-storages
+
+# Database Connectors
+pymongo
+djongo             # Kết nối MongoDB
+psycopg2-binary    # Kết nối PostgreSQL
+
+PyJWT
+argon2-cffi
+cryptography
+
+# API, Request Handling
+requests
+requests-oauthlib
+cors
+urllib3
+
+# Utilities
+python-dateutil
+pytz
+tzdata
+sqlparse
+Werkzeug
+
+paypalrestsdk

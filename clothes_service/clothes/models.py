@@ -6,6 +6,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.FloatField()
     stock = models.IntegerField()
+    score = models.FloatField(default=0.0)
     # ✅ Add this field explicitly
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -16,6 +16,8 @@ SERVICES = {
     "book": os.getenv("BOOK_SERVICE_URL", "http://localhost:8002"),
     "phone": os.getenv("PHONE_SERVICE_URL", "http://localhost:8008"),
     "clothes": os.getenv("CLOTHES_SERVICE_URL", "http://localhost:8004"),
+    "sentiment": os.getenv("SENTIMENT_SERVICE_URL", "http://localhost:8009"),
+    "comment": os.getenv("COMMENT_SERVICE_URL", "http://localhost:8010"),
 }
 
 

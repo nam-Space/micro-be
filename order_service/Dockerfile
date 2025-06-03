@@ -10,9 +10,11 @@ COPY . .
 # Install dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+RUN python manage.py makemigrations order
+RUN python manage.py migrate
 
 # Expose the port Django will run on
-EXPOSE 8000
+EXPOSE 8006
 
 # Run Django server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8765"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8006"]

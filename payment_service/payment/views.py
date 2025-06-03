@@ -8,7 +8,8 @@ from .models import Payment, PaymentStatus
 from .serializers import PaymentSerializer
 from .paypal_helper import paypalrestsdk
 
-ORDER_API = "http://127.0.0.1:8004/order/orders/"
+ORDER_API = "http://127.0.0.1:8006/order/orders/"
+
 
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
@@ -17,45 +18,76 @@ class PaymentViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"])
     def create_paypal_payment(self, request):
         order_id = request.data.get("order_id")
+        method = request.data.get("method")
+        customer_id = request.data.get("customer_id")
 
         # Validate Order
         order_resp = requests.get(f"{ORDER_API}{order_id}/")
+
         if order_resp.status_code != 200:
-            return Response({"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Order not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         order_data = order_resp.json()
+
         amount = order_data["total_price"]
 
         # Create PayPal Payment
-        payment = paypalrestsdk.Payment({
-            "intent": "sale",
-            "payer": {
-                "payment_method": "paypal"
-            },
-            "redirect_urls": {
-                "return_url": "http://127.0.0.1:8005/payment/paypal/execute/",
-                "cancel_url": "http://127.0.0.1:8005/payment/paypal/cancel/"
-            },
-            "transactions": [{
-                "amount": {
-                    "total": str(amount),
-                    "currency": "USD"
+        payment = paypalrestsdk.Payment(
+            {
+                "intent": "sale",
+                "payer": {"payment_method": "paypal"},
+                "redirect_urls": {
+                    "return_url": "http://127.0.0.1:8005/payment/paypal/execute/",
+                    "cancel_url": "http://127.0.0.1:8005/payment/paypal/cancel/",
                 },
-                "description": f"Payment for Order {order_id}"
-            }]
-        })
+                "transactions": [
+                    {
+                        "amount": {"total": str(amount), "currency": "USD"},
+                        "description": f"Payment for Order {order_id}",
+                    }
+                ],
+            }
+        )
 
         if payment.create():
-            approval_url = next(link["href"] for link in payment.links if link["rel"] == "approval_url")
+            approval_url = next(
+                link["href"] for link in payment.links if link["rel"] == "approval_url"
+            )
 
             # Save Payment
             Payment.objects.create(
-                order_id=order_id, amount=amount, method="PayPal", status=PaymentStatus.PENDING
+                order_id=order_id,
+                amount=amount,
+                method=method,
+                customer_id=customer_id,
+                status=PaymentStatus.PENDING,
             )
 
-            return Response({"payment_url": approval_url}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"payment_url": approval_url}, status=status.HTTP_201_CREATED
+            )
         else:
-            return Response({"error": "Failed to create PayPal payment"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Failed to create PayPal payment"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @action(
+        detail=False, methods=["get"], url_path="by-customer/(?P<customer_id>[^/.]+)"
+    )
+    def get_by_customer(self, request, customer_id=None):
+        try:
+            customer_id = int(customer_id)
+        except (TypeError, ValueError):
+            return Response({"error": "Invalid customer_id"}, status=400)
+
+        payments = Payment.objects.filter(customer_id=customer_id)
+        serializer = self.get_serializer(payments, many=True)
+
+        # Trả về danh sách JSON (có thể là []), không bao giờ trả về None
+        return Response(serializer.data, status=200)
 
     @action(detail=False, methods=["get"])
     def execute_paypal_payment(self, request):
@@ -72,8 +104,15 @@ class PaymentViewSet(viewsets.ModelViewSet):
             payment_record.save()
 
             # Update Order Status
-            requests.post(f"{ORDER_API}{order_id}/update_status/", json={"status": "Completed"})
+            requests.post(
+                f"{ORDER_API}{order_id}/update_status/", json={"status": "Completed"}
+            )
 
-            return Response({"message": "Payment successful"}, status=status.HTTP_200_OK)
+            return Response(
+                {"message": "Payment successful"}, status=status.HTTP_200_OK
+            )
         else:
-            return Response({"error": "Payment execution failed"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Payment execution failed"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )

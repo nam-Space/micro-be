@@ -23,3 +23,9 @@ python manage.py runserver 8007
 
 cd phone_service
 python manage.py runserver 8008
+
+cd sentiment_service
+python manage.py runserver 8009
+
+cd comment_service
+python manage.py runserver 8010

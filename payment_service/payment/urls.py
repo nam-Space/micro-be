@@ -3,9 +3,13 @@ from rest_framework.routers import DefaultRouter
 from .views import PaymentViewSet
 
 router = DefaultRouter()
-router.register(r'payments', PaymentViewSet)
+router.register(r"payments", PaymentViewSet)
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('paypal/execute/', PaymentViewSet.as_view({'get': 'execute_paypal_payment'}), name="execute-paypal"),
+    path("", include(router.urls)),
+    path(
+        "paypal/execute/",
+        PaymentViewSet.as_view({"get": "execute_paypal_payment"}),
+        name="execute-paypal",
+    ),
 ]
