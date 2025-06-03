@@ -5,13 +5,14 @@ import requests
 from .models import Order, OrderItem, OrderStatus
 from .serializers import OrderSerializer
 
-CUSTOMER_API = "http://127.0.0.1:8003/api/customers/"
+CUSTOMER_API = "http://127.0.0.1:8005/api/customers/"
 PRODUCT_APIS = {
-    "books": "http://127.0.0.1:8006/api/books/",
-    "phones": "http://127.0.0.1:8006/api/phones/",
-    "clothes": "http://127.0.0.1:8006/api/clothes/",
+    "books": "http://127.0.0.1:8002/api/books/",
+    "phones": "http://127.0.0.1:8008/api/phones/",
+    "clothes": "http://127.0.0.1:8004/api/clothes/",
 }
-CART_API = "http://127.0.0.1:8002/"
+CART_API = "http://127.0.0.1:8003/"
+
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
@@ -23,8 +24,11 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         # Validate Customer
         customer_resp = requests.get(f"{CUSTOMER_API}{customer_id}/")
+        print(f"customer_resp={customer_resp}")
         if customer_resp.status_code != 200:
-            return Response({"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Customer not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
         # Fetch Product Data
         total_price = 0
@@ -35,23 +39,34 @@ class OrderViewSet(viewsets.ModelViewSet):
             quantity = item.get("quantity", 1)
 
             if category not in PRODUCT_APIS:
-                return Response({"error": f"Invalid category: {category}"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"error": f"Invalid category: {category}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             product_resp = requests.get(f"{PRODUCT_APIS[category]}{product_id}/")
             if product_resp.status_code != 200:
-                return Response({"error": f"Product {product_id} not found"}, status=status.HTTP_404_NOT_FOUND)
+                return Response(
+                    {"error": f"Product {product_id} not found"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
 
             product_data = product_resp.json()
             total_price += float(product_data["price"]) * quantity
-            delete_in_cart = requests.delete(f"{CART_API}{customer_id}/remove/{category}/{product_id}/")
+            delete_in_cart = requests.delete(
+                f"{CART_API}{customer_id}/remove/{category}/{product_id}/"
+            )
             print("delete_in_cart", delete_in_cart.json())
-            order_items.append({
-                "category": category,
-                "product_id": product_id,
-                "product_name": product_data["name"],
-                "price": product_data["price"],
-                "quantity": quantity
-            })
+            order_items.append(
+                {
+                    "category": category,
+                    "product_id": product_id,
+                    "product_name": product_data["name"],
+                    "product_image": product_data["url"],
+                    "price": product_data["price"],
+                    "quantity": quantity,
+                }
+            )
 
         # Save Order
         order = Order.objects.create(customer_id=customer_id, total_price=total_price)
@@ -65,7 +80,17 @@ class OrderViewSet(viewsets.ModelViewSet):
         order = self.get_object()
         status = request.data.get("status")
         if status not in OrderStatus.values:
-            return Response({"error": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST
+            )
         order.status = status
         order.save()
         return Response(OrderSerializer(order).data)
+
+    @action(
+        detail=False, methods=["get"], url_path="by-customer/(?P<customer_id>[^/.]+)"
+    )
+    def get_by_customer(self, request, customer_id=None):
+        orders = Order.objects.filter(customer_id=customer_id)
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
