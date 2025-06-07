@@ -86,7 +86,7 @@ DATABASES = {
         "NAME": "customer_be",
         "USER": "root",
         "PASSWORD": "",
-        "HOST": "127.0.0.1",  # ✅ Use local MySQL instead of Docker
+        "HOST": "localhost",  # ✅ Use local MySQL instead of Docker
         "PORT": "3306",
     }
 }
